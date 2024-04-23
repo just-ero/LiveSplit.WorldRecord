@@ -1,8 +1,9 @@
-﻿using LiveSplit.Model;
-using LiveSplit.UI.Components;
-using System;
+﻿using System;
 
-[assembly:ComponentFactory(typeof(LiveSplit.WorldRecord.UI.Components.WorldRecordFactory))]
+using LiveSplit.Model;
+using LiveSplit.UI.Components;
+
+[assembly: ComponentFactory(typeof(LiveSplit.WorldRecord.UI.Components.WorldRecordFactory))]
 
 namespace LiveSplit.WorldRecord.UI.Components
 {
@@ -14,7 +15,10 @@ namespace LiveSplit.WorldRecord.UI.Components
 
         public ComponentCategory Category => ComponentCategory.Information;
 
-        public IComponent Create(LiveSplitState state) => new WorldRecordComponent(state);
+        public IComponent Create(LiveSplitState state)
+        {
+            return new WorldRecordComponent(state);
+        }
 
         public string UpdateName => ComponentName;
 

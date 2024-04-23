@@ -1,19 +1,21 @@
-﻿using LiveSplit.Model;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Xml;
+
+using LiveSplit.Model;
+using LiveSplit.Options;
 using LiveSplit.TimeFormatters;
 using LiveSplit.UI;
 using LiveSplit.UI.Components;
 using LiveSplit.Web.Share;
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.Xml;
+
 using SpeedrunComSharp;
-using System.Collections.ObjectModel;
-using LiveSplit.Options;
 
 namespace LiveSplit.WorldRecord.UI.Components
 {
@@ -83,12 +85,17 @@ namespace LiveSplit.WorldRecord.UI.Components
                     IEnumerable<VariableValue> variableFilter = null;
                     if (Settings.FilterVariables || Settings.FilterSubcategories)
                     {
-                        variableFilter = State.Run.Metadata.VariableValues.Values.Where(value => {
+                        variableFilter = State.Run.Metadata.VariableValues.Values.Where(value =>
+                        {
                             if (value == null)
+                            {
                                 return false;
+                            }
 
                             if (value.Variable.IsSubcategory)
+                            {
                                 return Settings.FilterSubcategories;
+                            }
 
                             return Settings.FilterVariables;
                         });
@@ -100,15 +107,20 @@ namespace LiveSplit.WorldRecord.UI.Components
                     if (Settings.FilterPlatform)
                     {
                         if (State.Run.Metadata.UsesEmulator)
+                        {
                             emulatorFilter = EmulatorsFilter.OnlyEmulators;
+                        }
                         else
+                        {
                             emulatorFilter = EmulatorsFilter.NoEmulators;
+                        }
                     }
+
                     var timingMethodFilter = GetTimingMethodOverride();
 
-                    var leaderboard = Client.Leaderboards.GetLeaderboardForFullGameCategory(State.Run.Metadata.Game.ID, State.Run.Metadata.Category.ID, 
+                    var leaderboard = Client.Leaderboards.GetLeaderboardForFullGameCategory(State.Run.Metadata.Game.ID, State.Run.Metadata.Category.ID,
                         top: 1,
-                        platformId: platformFilter, regionId: regionFilter, 
+                        platformId: platformFilter, regionId: regionFilter,
                         emulatorsFilter: emulatorFilter, variableFilters: variableFilter, orderBy: timingMethodFilter);
 
                     if (leaderboard != null)
@@ -139,9 +151,13 @@ namespace LiveSplit.WorldRecord.UI.Components
                 if (game != null)
                 {
                     if (timingMethodOverride != null)
+                    {
                         timingMethod = timingMethodOverride.Value.ToLiveSplitTimingMethod();
+                    }
                     else
+                    {
                         timingMethod = game.Ruleset.DefaultTimingMethod.ToLiveSplitTimingMethod();
+                    }
 
                     LocalTimeFormatter.Accuracy = game.Ruleset.ShowMilliseconds ? TimeAccuracy.Hundredths : TimeAccuracy.Seconds;
                 }
@@ -150,7 +166,9 @@ namespace LiveSplit.WorldRecord.UI.Components
                 var isLoggedIn = SpeedrunCom.Client.IsAccessTokenValid;
                 var userName = string.Empty;
                 if (isLoggedIn)
+                {
                     userName = SpeedrunCom.Client.Profile.Name;
+                }
 
                 var runners = string.Join(", ", AllTies.Select(t => string.Join(" & ", t.Players.Select(p =>
                     isLoggedIn && p.Name == userName ? "me" : p.Name))));
@@ -166,12 +184,13 @@ namespace LiveSplit.WorldRecord.UI.Components
 
                 if (centeredText)
                 {
-                    var textList = new List<string>();
-
-                    textList.Add(string.Format("World Record is {0} by {1}", formatted, runners));
-                    textList.Add(string.Format("World Record: {0} by {1}", formatted, runners));
-                    textList.Add(string.Format("WR: {0} by {1}", formatted, runners));
-                    textList.Add(string.Format("WR is {0} by {1}", formatted, runners));
+                    var textList = new List<string>
+                    {
+                        string.Format("World Record is {0} by {1}", formatted, runners),
+                        string.Format("World Record: {0} by {1}", formatted, runners),
+                        string.Format("WR: {0} by {1}", formatted, runners),
+                        string.Format("WR is {0} by {1}", formatted, runners)
+                    };
 
                     if (tieCount > 1)
                     {
@@ -225,9 +244,15 @@ namespace LiveSplit.WorldRecord.UI.Components
         private bool IsPBTimeLower(TimeSpan? pbTime, TimeSpan? recordTime, bool showMillis)
         {
             if (pbTime == null || recordTime == null)
+            {
                 return false;
+            }
+
             if (showMillis)
+            {
                 return (int)pbTime.Value.TotalMilliseconds <= (int)recordTime.Value.TotalMilliseconds;
+            }
+
             return (int)pbTime.Value.TotalSeconds <= (int)recordTime.Value.TotalSeconds;
         }
 
@@ -238,29 +263,50 @@ namespace LiveSplit.WorldRecord.UI.Components
             var splitTime = lastSplit.SplitTime[method];
 
             if (State.CurrentPhase == TimerPhase.Ended && splitTime < pbTime)
+            {
                 return splitTime;
+            }
+
             return pbTime;
         }
 
         private TimeSpan? GetWorldRecordTime(SpeedrunComSharp.TimingMethod? timingMethodOverride)
         {
             if (timingMethodOverride == SpeedrunComSharp.TimingMethod.RealTime)
+            {
                 return WorldRecord.Times.RealTime;
+            }
+
             if (timingMethodOverride == SpeedrunComSharp.TimingMethod.RealTimeWithoutLoads)
+            {
                 return WorldRecord.Times.RealTimeWithoutLoads;
+            }
+
             if (timingMethodOverride == SpeedrunComSharp.TimingMethod.GameTime)
+            {
                 return WorldRecord.Times.GameTime;
+            }
+
             return WorldRecord.Times.Primary;
         }
 
         private SpeedrunComSharp.TimingMethod? GetTimingMethodOverride()
         {
             if (Settings.TimingMethod == "Real Time")
+            {
                 return SpeedrunComSharp.TimingMethod.RealTime;
+            }
+
             if (Settings.TimingMethod == "Real Time Without Loads")
+            {
                 return SpeedrunComSharp.TimingMethod.RealTimeWithoutLoads;
+            }
+
             if (Settings.TimingMethod == "Game Time")
+            {
                 return SpeedrunComSharp.TimingMethod.GameTime;
+            }
+
             return null;
         }
 
@@ -306,8 +352,8 @@ namespace LiveSplit.WorldRecord.UI.Components
         private void DrawBackground(Graphics g, LiveSplitState state, float width, float height)
         {
             if (Settings.BackgroundColor.A > 0
-                || Settings.BackgroundGradient != GradientType.Plain
-                && Settings.BackgroundColor2.A > 0)
+                || (Settings.BackgroundGradient != GradientType.Plain
+                && Settings.BackgroundColor2.A > 0))
             {
                 var gradientBrush = new LinearGradientBrush(
                             new PointF(0, 0),
@@ -387,6 +433,9 @@ namespace LiveSplit.WorldRecord.UI.Components
             Settings.SetSettings(settings);
         }
 
-        public int GetSettingsHashCode() => Settings.GetSettingsHashCode();
+        public int GetSettingsHashCode()
+        {
+            return Settings.GetSettingsHashCode();
+        }
     }
 }

@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Windows.Forms;
 using System.Xml;
+
 using LiveSplit.Model;
 
 namespace LiveSplit.UI.Components
@@ -68,17 +69,17 @@ namespace LiveSplit.UI.Components
             cmbTimingMethod.DataBindings.Add("SelectedItem", this, "TimingMethod", false, DataSourceUpdateMode.OnPropertyChanged);
         }
 
-        void chkOverrideTimeColor_CheckedChanged(object sender, EventArgs e)
+        private void chkOverrideTimeColor_CheckedChanged(object sender, EventArgs e)
         {
             label2.Enabled = btnTimeColor.Enabled = chkOverrideTimeColor.Checked;
         }
 
-        void chkOverrideTextColor_CheckedChanged(object sender, EventArgs e)
+        private void chkOverrideTextColor_CheckedChanged(object sender, EventArgs e)
         {
             label1.Enabled = btnTextColor.Enabled = chkOverrideTextColor.Checked;
         }
 
-        void WorldRecordSettings_Load(object sender, EventArgs e)
+        private void WorldRecordSettings_Load(object sender, EventArgs e)
         {
             chkOverrideTextColor_CheckedChanged(null, null);
             chkOverrideTimeColor_CheckedChanged(null, null);
@@ -94,10 +95,11 @@ namespace LiveSplit.UI.Components
                 chkTwoRows.DataBindings.Clear();
                 chkTwoRows.DataBindings.Add("Checked", this, "Display2Rows", false, DataSourceUpdateMode.OnPropertyChanged);
             }
+
             chkTwoRows_CheckedChanged(null, null);
         }
 
-        void cmbGradientType_SelectedIndexChanged(object sender, EventArgs e)
+        private void cmbGradientType_SelectedIndexChanged(object sender, EventArgs e)
         {
             btnColor1.Visible = cmbGradientType.SelectedItem.ToString() != "Plain";
             btnColor2.DataBindings.Clear();
